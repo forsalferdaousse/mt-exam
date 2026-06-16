@@ -16,7 +16,7 @@ class EM_Ajax
     {
         wp_enqueue_script(
             'em-ajax',
-            plugins_url('/js/em-ajax.js', EM_PLUGIN_URL),
+            plugin_dir_url(dirname(__FILE__)) . 'assets/js/em-ajax.js',
             array('jquery'),
             EM_VERSION,
             true
@@ -31,7 +31,7 @@ class EM_Ajax
     public static function get_exams()
     {
         if (! isset($_POST['nonce']) || ! wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])), 'em_ajax_nonce')) {
-            wp_send_json_error(array('message' => __('Invalid request.', 'mt-exam')), 403);
+            wp_send_json_error(array('message' => __('Invalid security token.', 'mt-exam')), 403);
         }
 
         $page     = isset($_POST['page'])     ? max(1, absint($_POST['page']))     : 1;
@@ -85,14 +85,15 @@ class EM_Ajax
         usort($upcoming, function ($a, $b) {
             return strcmp($a['start'], $b['start']);
         });
-        usort($past,     function ($a, $b) {
+
+        usort($past, function ($a, $b) {
             return strcmp($b['end'], $a['end']);
         });
 
         $all_sorted  = array_merge($current, $upcoming, $past);
+
         $total       = count($all_sorted);
         $total_pages = (int) ceil($total / $per_page);
-
         $paged       = array_slice($all_sorted, ($page - 1) * $per_page, $per_page);
 
         wp_send_json_success(array(

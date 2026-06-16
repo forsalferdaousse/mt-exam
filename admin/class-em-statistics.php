@@ -65,7 +65,6 @@ class EM_Statistics
     {
         global $wpdb;
 
-        // Step 1: Extract all student names indexed securely by ID
         $student_rows = $wpdb->get_results(
             "SELECT ID, post_title FROM {$wpdb->posts} WHERE post_type = 'em_student' AND post_status = 'publish'",
             ARRAY_A
